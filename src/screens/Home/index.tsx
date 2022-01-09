@@ -31,36 +31,51 @@ export function Home() {
   async function loadData() {
     const dataKey = '@savepass:logins';
     // Get asyncStorage data, use setSearchListData and setData
-  }
-
-  function handleFilterLoginData() {
-    // Filter results inside data, save with setSearchListData
+    const response = await AsyncStorage.getItem(dataKey);
+    if (response) {
+      const parsedData = JSON.parse(response);
+      setData(parsedData);
+      console.log('response: ', parsedData);
+      setSearchListData(parsedData);
+    }
   }
 
   function handleChangeInputText(text: string) {
     // Update searchText value
+    if (text) setSearchText(text);
   }
 
-  useFocusEffect(useCallback(() => {
-    loadData();
-  }, []));
+  function handleFilterLoginData() {
+    // Filter results inside data, save with setSearchListData
+    const filteredData = searchListData.filter((data) => {
+      if (data.service_name.includes(searchText)) {
+        return data;
+      }
+    });
+    setSearchListData(filteredData);
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      loadData();
+    }, [])
+  );
 
   return (
     <>
       <Header
         user={{
           name: 'Rocketseat',
-          avatar_url: 'https://i.ibb.co/ZmFHZDM/rocketseat.jpg'
+          avatar_url: 'https://i.ibb.co/ZmFHZDM/rocketseat.jpg',
         }}
       />
       <Container>
         <SearchBar
-          placeholder="Qual senha você procura?"
+          placeholder='Qual senha você procura?'
           onChangeText={handleChangeInputText}
           value={searchText}
-          returnKeyType="search"
+          returnKeyType='search'
           onSubmitEditing={handleFilterLoginData}
-
           onSearchButtonPress={handleFilterLoginData}
         />
 
@@ -69,8 +84,7 @@ export function Home() {
           <TotalPassCount>
             {searchListData.length
               ? `${`${searchListData.length}`.padStart(2, '0')} ao total`
-              : 'Nada a ser exibido'
-            }
+              : 'Nada a ser exibido'}
           </TotalPassCount>
         </Metadata>
 
@@ -78,14 +92,16 @@ export function Home() {
           keyExtractor={(item) => item.id}
           data={searchListData}
           renderItem={({ item: loginData }) => {
-            return <LoginDataItem
-              service_name={loginData.service_name}
-              email={loginData.email}
-              password={loginData.password}
-            />
+            return (
+              <LoginDataItem
+                service_name={loginData.service_name}
+                email={loginData.email}
+                password={loginData.password}
+              />
+            );
           }}
         />
       </Container>
     </>
-  )
+  );
 }
