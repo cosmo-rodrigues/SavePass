@@ -35,14 +35,17 @@ export function Home() {
     if (response) {
       const parsedData = JSON.parse(response);
       setData(parsedData);
-      console.log('response: ', parsedData);
       setSearchListData(parsedData);
     }
   }
 
   function handleChangeInputText(text: string) {
     // Update searchText value
-    if (text) setSearchText(text);
+    if (text) {
+      setSearchText(text);
+    } else {
+      setSearchListData(data);
+    }
   }
 
   function handleFilterLoginData() {
